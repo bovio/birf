@@ -10,81 +10,62 @@ class Search extends React.Component {
     this.handleTermChange = this.handleTermChange.bind(this);
   }
 
-  handleTermChange(e) {
-    this.props.search(e.target.value);
+  handleTermChange(type, e) {
+    this.props.search(type, e.target.value);
   }
 
   render() {
     return (
       <div className="SearchBar">
-        <input placeholder="Search By Artist" />
-        <br />
-        <input placeholder="Search By Album" />
-        <br />
-        <input placeholder="Search By Song" />
-        <br />
         <input
-          placeholder="Enter A Song, Album, or Artist"
-          onChange={this.handleTermChange}
-        />
+          placeholder="Search Albums"
+          onChange={e => this.handleTermChange("album", e)}
+        />{" "}
       </div>
     );
   }
 }
 // Renders the results of the search
-class SearchResults extends React.Component {
-  constructor(props) {
-    super(props);
 
-    this.searchResults = this.searchResults.bind(this);
-  }
+const AlbumSearchResults = props => {
+  const results = props.searchResults || [];
+  return (
+    <div className="SearchResults">
+      <ul>
+        <div className="SearchResults">
+          <h1>Search Results: </h1>
 
-  searchResults = () => {
-    return (
-      <div className="SearchResults">
-        <h1>Search Results: </h1>
-
-        {this.props.searchResults.map(track => {
-          return (
-            <div className="renderedResults">
-              <h2>
-                <li>Artist: {track.artist}</li>
-                <li>Song: {track.name}</li>
-                <li>Album: {track.album}</li>
-              </h2>
-              <button
-                className="Sell"
-                album={track.album}
-                song={track.name}
-                artist={track.artist}
-                popularity={track.popularity}
-                onClick={e =>
-                  this.props.handleAddToCart(
-                    e,
-                    track.artist,
-                    track.album,
-                    track.popularity,
-                    track.name,
-                    track.label
-                  )
-                }
-              >
-                Sell
-              </button>
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
-  render() {
-    return (
-      <div className="SearchResults">
-        <ul>{this.searchResults()}</ul>
-      </div>
-    );
-  }
-}
+          {results.map(album => {
+            return (
+              <div className="renderedResults">
+                <h2>
+                  <li>{album.artists[0].name}</li>
+                  <li>{album.name}</li>
+                  <img src={album.images[0].url} />
+                  <br />
+                  <button
+                    className="Sell"
+                    onClick={e =>
+                      props.handleAddToCart(
+                        e,
+                        album.artists[0].name,
+                        album.name,
+                        album.images[0].url,
+                        album.id
+                      )
+                    }
+                  >
+                    Sell
+                  </button>
+                </h2>{" "}
+              </div>
+            );
+          })}
+        </div>
+      </ul>
+    </div>
+  );
+};
 
 class App extends React.Component {
   constructor(props) {
@@ -92,7 +73,8 @@ class App extends React.Component {
     this.state = {
       birfWallet: 1000,
       yourWallet: 0,
-      searchResults: []
+      searchResults: [],
+      selling: []
     };
 
     this.addToCart = this.addToCart.bind(this);
@@ -100,26 +82,49 @@ class App extends React.Component {
     this.handleAddToCart = this.handleAddToCart.bind(this);
   }
 
-  handleAddToCart = (e, artist, album, song, popularity) => {
+  handleAddToCart = (e, artist, album, images, id, name) => {
     console.log(artist);
     console.log(album);
-    console.log(song);
-    console.log(popularity);
+    console.log(images);
+    console.log(id);
+    this.setState({
+      selling: {
+        artist: artist,
+        album: album,
+        images: images,
+        id: id
+      }
+    });
   };
+
+  sell = () => {};
 
   addToCart = e => {
-    console.log(this.state.value);
+    console.log(this.state.selling);
   };
 
-  search(input) {
-    Spotify.search(input).then(searchResults => {
-      return this.setState({ searchResults: searchResults });
+  search(type, input) {
+    Spotify.search(type, input).then(searchResults => {
+      return this.setState({
+        searchResults: searchResults,
+        currentSearchType: type
+      });
     });
   }
   render() {
-    console.log(this.state);
+    let resultComponent;
+
+    resultComponent = (
+      <AlbumSearchResults
+        searchResults={this.state.searchResults}
+        addToCart={this.addToCart}
+        handleAddToCart={this.handleAddToCart}
+      />
+    );
+
     return (
       <div>
+        <meta name="pinterest" content="nopin" />
         <div className="Header">
           <h1>What d'ya got?</h1>
         </div>
@@ -129,11 +134,7 @@ class App extends React.Component {
         </div>
         <div className="App">
           <Search search={this.search} />
-          <SearchResults
-            searchResults={this.state.searchResults}
-            addToCart={this.addToCart}
-            handleAddToCart={this.handleAddToCart}
-          />
+          {resultComponent}
         </div>
       </div>
     );

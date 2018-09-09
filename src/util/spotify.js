@@ -20,28 +20,28 @@ const Spotify = {
     }
   },
 
-  search(term) {
+  search(type, term) {
     this.getAccessToken();
-    return fetch(`https://api.spotify.com/v1/search?type=track&q=${term}`, {
+
+    const query = () => {
+      if (type === "artist") {
+        return `https://api.spotify.com/v1/search?q=${term}&type=${type}&includes_group=album`;
+      } else if (type === "album") {
+        return `https://api.spotify.com/v1/search?q=${term}&type=${type}&tracks`;
+      }
+    };
+
+    return fetch(query(), {
       headers: {
         Authorization: `Bearer ${accessToken}`
       }
     })
       .then(response => response.json())
       .then(jsonResponse => {
-        if (!jsonResponse.tracks) {
-          return [];
-        } else {
-          return jsonResponse.tracks.items.map(track => {
-            return {
-              id: track.id,
-              name: track.name,
-              artist: track.artists[0].name,
-              album: track.album.name,
-              uri: track.uri,
-              popularity: track.popularity
-            };
-          });
+        if (`${type}` === "album" && jsonResponse.albums) {
+          return jsonResponse.albums.items;
+        } else if (`${type}` === "artist" && jsonResponse.artists) {
+          return jsonResponse.artists.items;
         }
       });
   }
