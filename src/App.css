@@ -1,0 +1,52 @@
+.App {
+  background: #8d6a9f;
+  height: 1000px;
+}
+
+.Header {
+  text-align: center;
+  background: #fe938c;
+  height: 80px;
+  display: grid;
+}
+
+.Wallets {
+  background: #fe938c;
+  display: grid;
+  text-align: center;
+}
+
+.SearchBar {
+  display: inline-block;
+  width: 100%;
+  background: #8cbcb9;
+  text-align: center;
+  padding-bottom: 30px;
+  padding-top: 30px;
+}
+
+.SearchBar input {
+  border: 1px solid #8cbcb9;
+  width: 300px;
+  text-align: center;
+  height: 25px;
+  font-size: 15px;
+}
+
+.SearchResults {
+  background: #8d6a9f;
+  width: 100%;
+  display: grid;
+  text-align: center;
+}
+
+.renderedResults {
+  list-style: none;
+  text-align: center;
+}
+
+.Sell {
+  background-color: white;
+  color: black;
+  border: 1px solid #8d6a9f;
+}
