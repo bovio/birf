@@ -26,8 +26,8 @@ const Spotify = {
     const query = () => {
       if (type === "artist") {
         return `https://api.spotify.com/v1/search?q=${term}&type=${type}&includes_group=album`;
-      } else if (type === "album") {
-        return `https://api.spotify.com/v1/search?q=${term}&type=${type}&tracks`;
+      } else if (type === "album" || "track") {
+        return `https://api.spotify.com/v1/search?q=${term}&type=${type}&includes_group=tracks`;
       }
     };
 

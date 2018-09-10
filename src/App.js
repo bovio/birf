@@ -21,6 +21,10 @@ class Search extends React.Component {
           placeholder="Search Albums"
           onChange={e => this.handleTermChange("album", e)}
         />{" "}
+        <input
+          placeholder="search tracks"
+          onChange={e => this.handleTermChange("track", e)}
+        />
       </div>
     );
   }
@@ -36,6 +40,7 @@ const AlbumSearchResults = props => {
           <h1>Search Results: </h1>
 
           {results.map(album => {
+            console.log(album);
             return (
               <div className="renderedResults">
                 <h2>
@@ -51,7 +56,8 @@ const AlbumSearchResults = props => {
                         album.artists[0].name,
                         album.name,
                         album.images[0].url,
-                        album.id
+                        album.id,
+                        album.popularity
                       )
                     }
                   >
@@ -74,7 +80,16 @@ class App extends React.Component {
       birfWallet: 1000,
       yourWallet: 0,
       searchResults: [],
-      selling: []
+      selling: [
+        {
+          artist: "",
+          album: "",
+          images: "",
+          id: "",
+          tracks: [],
+          popularity: 0
+        }
+      ]
     };
 
     this.addToCart = this.addToCart.bind(this);
@@ -82,11 +97,13 @@ class App extends React.Component {
     this.handleAddToCart = this.handleAddToCart.bind(this);
   }
 
-  handleAddToCart = (e, artist, album, images, id, name) => {
+  handleAddToCart = (e, artist, album, images, id, popularity) => {
+    console.log(this.state);
     console.log(artist);
     console.log(album);
     console.log(images);
     console.log(id);
+    console.log(popularity);
     this.setState({
       selling: {
         artist: artist,
@@ -96,8 +113,6 @@ class App extends React.Component {
       }
     });
   };
-
-  sell = () => {};
 
   addToCart = e => {
     console.log(this.state.selling);
@@ -115,13 +130,14 @@ class App extends React.Component {
     let resultComponent;
 
     resultComponent = (
-      <AlbumSearchResults
-        searchResults={this.state.searchResults}
-        addToCart={this.addToCart}
-        handleAddToCart={this.handleAddToCart}
-      />
+      <div>
+        <AlbumSearchResults
+          searchResults={this.state.searchResults}
+          addToCart={this.addToCart}
+          handleAddToCart={this.handleAddToCart}
+        />
+      </div>
     );
-
     return (
       <div>
         <meta name="pinterest" content="nopin" />
