@@ -20,10 +20,6 @@ class Search extends React.Component {
         <input
           placeholder="Search Albums"
           onChange={e => this.handleTermChange("album", e)}
-        />{" "}
-        <input
-          placeholder="search tracks"
-          onChange={e => this.handleTermChange("track", e)}
         />
       </div>
     );
@@ -33,6 +29,7 @@ class Search extends React.Component {
 
 const AlbumSearchResults = props => {
   const results = props.searchResults || [];
+
   return (
     <div className="SearchResults">
       <ul>
@@ -40,7 +37,6 @@ const AlbumSearchResults = props => {
           <h1>Search Results: </h1>
 
           {results.map(album => {
-            console.log(album);
             return (
               <div className="renderedResults">
                 <h2>
@@ -56,8 +52,7 @@ const AlbumSearchResults = props => {
                         album.artists[0].name,
                         album.name,
                         album.images[0].url,
-                        album.id,
-                        album.popularity
+                        album.id
                       )
                     }
                   >
@@ -80,52 +75,54 @@ class App extends React.Component {
       birfWallet: 1000,
       yourWallet: 0,
       searchResults: [],
-      selling: [
-        {
-          artist: "",
-          album: "",
-          images: "",
-          id: "",
-          tracks: [],
-          popularity: 0
-        }
-      ]
+      popResults: [],
+      trackPop: []
     };
 
     this.addToCart = this.addToCart.bind(this);
     this.search = this.search.bind(this);
     this.handleAddToCart = this.handleAddToCart.bind(this);
+    this.handleGetTrackPop = this.handleGetTrackPop.bind(this);
+    this.filterResults = this.filterResults.bind(this);
   }
 
-  handleAddToCart = (e, artist, album, images, id, popularity) => {
-    console.log(this.state);
+  handleAddToCart = (e, artist, album, images, id) => {
     console.log(artist);
     console.log(album);
-    console.log(images);
     console.log(id);
-    console.log(popularity);
-    this.setState({
-      selling: {
-        artist: artist,
-        album: album,
-        images: images,
-        id: id
-      }
+    this.handleGetTrackPop(id);
+  };
+
+  handleGetTrackPop = () => {
+    let results = this.state.searchResults.map(item => item.id);
+    console.log(results);
+    let firstTrack = results[0];
+    Spotify.search("track", null, firstTrack).then(searchResults => {
+      return this.setState({
+        popResults: searchResults
+      });
     });
+    console.log(this.state.popResults);
   };
 
   addToCart = e => {
-    console.log(this.state.selling);
+    console.log(this.state.popResults);
   };
 
-  search(type, input) {
-    Spotify.search(type, input).then(searchResults => {
+  search(type, input, id) {
+    Spotify.search(type, input, id).then(searchResults => {
       return this.setState({
         searchResults: searchResults,
         currentSearchType: type
       });
     });
   }
+
+  filterResults() {
+    let genResults = this.state.searchResults.map(results => results.id);
+    let popResults = this.state.popResults.map(results => results.id);
+  }
+
   render() {
     let resultComponent;
 
@@ -135,6 +132,9 @@ class App extends React.Component {
           searchResults={this.state.searchResults}
           addToCart={this.addToCart}
           handleAddToCart={this.handleAddToCart}
+          handleGetTrackPop={this.handleGetTrackPop}
+          popResults={this.popResults}
+          popSearch={this.popSearch}
         />
       </div>
     );

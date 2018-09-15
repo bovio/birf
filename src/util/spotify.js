@@ -16,18 +16,20 @@ const Spotify = {
       accessToken = urlAccessToken[1];
       expiresIn = urlExpiresIn[1];
     } else {
-      window.location.href = `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=token&scope=playlist-modify-public&redirect_uri=${redirect_uri}`;
+      window.location.href = `https://accounts.spotify.com/authorize?client_id=${client_id}&response_type=token&redirect_uri=${redirect_uri}`;
     }
   },
 
-  search(type, term) {
+  search(type, term, id) {
     this.getAccessToken();
 
     const query = () => {
       if (type === "artist") {
         return `https://api.spotify.com/v1/search?q=${term}&type=${type}&includes_group=album`;
-      } else if (type === "album" || "track") {
-        return `https://api.spotify.com/v1/search?q=${term}&type=${type}&includes_group=tracks`;
+      } else if (type === "album") {
+        return `https://api.spotify.com/v1/search?q=${term}&type=${type}`;
+      } else if (type === "track") {
+        return `https://api.spotify.com/v1/albums/${id}/tracks?offset=0&limit=20`;
       }
     };
 
@@ -42,6 +44,8 @@ const Spotify = {
           return jsonResponse.albums.items;
         } else if (`${type}` === "artist" && jsonResponse.artists) {
           return jsonResponse.artists.items;
+        } else if (`${type}` === "track" && jsonResponse.tracks) {
+          return jsonResponse.tracks.items;
         }
       });
   }
