@@ -2,6 +2,55 @@ import React from "react";
 import "./App.css";
 import Spotify from "./util/spotify.js";
 
+// Renders the results of the search
+
+const AlbumSearchResults = props => {
+  const results = props.searchResults || [];
+  if (results.length !== 0) {
+    return (
+      <div className="SearchResults">
+        <ul>
+          <div className="SearchResults">
+            <h1>Search Results: </h1>
+            {results.map(album => {
+              return (
+                <div className="renderedResults">
+                  <h2>
+                    <li>{album.artists[0].name}</li>
+                    <li>{album.name}</li>
+                    <img src={album.images[0].url} />
+                    <br />
+                    <button
+                      className="Sell"
+                      onClick={e =>
+                        props.handleAddToCart(
+                          e,
+                          album.artists[0].name,
+                          album.name,
+                          album.images[0].url,
+                          album.id
+                        )
+                      }
+                    >
+                      Sell
+                    </button>
+                  </h2>{" "}
+                </div>
+              );
+            })}
+          </div>
+        </ul>
+      </div>
+    );
+  } else {
+    return (
+      <div className="emptySearch">
+        <h2 />
+      </div>
+    );
+  }
+};
+
 // Handles the app's searchbar component
 class Search extends React.Component {
   constructor(props) {
@@ -25,48 +74,6 @@ class Search extends React.Component {
     );
   }
 }
-// Renders the results of the search
-
-const AlbumSearchResults = props => {
-  const results = props.searchResults || [];
-
-  return (
-    <div className="SearchResults">
-      <ul>
-        <div className="SearchResults">
-          <h1>Search Results: </h1>
-
-          {results.map(album => {
-            return (
-              <div className="renderedResults">
-                <h2>
-                  <li>{album.artists[0].name}</li>
-                  <li>{album.name}</li>
-                  <img src={album.images[0].url} />
-                  <br />
-                  <button
-                    className="Sell"
-                    onClick={e =>
-                      props.handleAddToCart(
-                        e,
-                        album.artists[0].name,
-                        album.name,
-                        album.images[0].url,
-                        album.id
-                      )
-                    }
-                  >
-                    Sell
-                  </button>
-                </h2>{" "}
-              </div>
-            );
-          })}
-        </div>
-      </ul>
-    </div>
-  );
-};
 
 class App extends React.Component {
   constructor(props) {
@@ -78,50 +85,38 @@ class App extends React.Component {
       popResults: [],
       trackPop: []
     };
-
-    this.addToCart = this.addToCart.bind(this);
-    this.search = this.search.bind(this);
-    this.handleAddToCart = this.handleAddToCart.bind(this);
-    this.handleGetTrackPop = this.handleGetTrackPop.bind(this);
-    this.filterResults = this.filterResults.bind(this);
   }
 
   handleAddToCart = (e, artist, album, images, id) => {
     console.log(artist);
     console.log(album);
     console.log(id);
-    this.handleGetTrackPop(id);
+    this.filterId(id);
   };
 
-  handleGetTrackPop = () => {
-    let results = this.state.searchResults.map(item => item.id);
+  filterId = () => {
+    let results = this.state.searchResults.reduce((id, albums) => {
+      return id.concat(albums.id);
+    }, []);
     console.log(results);
-    let firstTrack = results[0];
-    Spotify.search("track", null, firstTrack).then(searchResults => {
-      return this.setState({
-        popResults: searchResults
-      });
-    });
-    console.log(this.state.popResults);
+    // Spotify.search("track", null, results[0]).then(searchResults => {
+    //   let bigDicks = searchResults;
+    //   console.log(bigDicks);
+    // });
   };
 
   addToCart = e => {
     console.log(this.state.popResults);
   };
 
-  search(type, input, id) {
+  search = (type, input, id) => {
     Spotify.search(type, input, id).then(searchResults => {
       return this.setState({
         searchResults: searchResults,
         currentSearchType: type
       });
     });
-  }
-
-  filterResults() {
-    let genResults = this.state.searchResults.map(results => results.id);
-    let popResults = this.state.popResults.map(results => results.id);
-  }
+  };
 
   render() {
     let resultComponent;
