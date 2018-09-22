@@ -20,7 +20,7 @@ const Spotify = {
     }
   },
 
-  search(type, term, id) {
+  async search(type, term, id) {
     this.getAccessToken();
 
     const query = () => {
@@ -32,22 +32,31 @@ const Spotify = {
         return `https://api.spotify.com/v1/albums/${id}/tracks?offset=0&limit=20`;
       }
     };
-
-    return fetch(query(), {
-      headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
-    })
-      .then(response => response.json())
-      .then(jsonResponse => {
-        if (`${type}` === "album" && jsonResponse.albums) {
-          return jsonResponse.albums.items;
-        } else if (`${type}` === "artist" && jsonResponse.artists) {
-          return jsonResponse.artists.items;
-        } else if (`${type}` === "track" && jsonResponse.tracks) {
-          return jsonResponse.tracks.items;
+    if (type === "artist" || "album") {
+      return fetch(query(), {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
         }
-      });
+      })
+        .then(response => response.json())
+        .then(jsonResponse => {
+          if (`${type}` === "album" && jsonResponse.albums) {
+            return jsonResponse.albums.items;
+          } else if (`${type}` === "artist" && jsonResponse.artists) {
+            return jsonResponse.artists.items;
+          }
+        });
+    } else {
+      return fetch(query(), {
+        headers: {
+          Authorization: `Bearer ${accessToken}`
+        }
+      })
+        .then(response => response.json())
+        .then(jsonResponse => {
+          return jsonResponse.tracks.items;
+        });
+    }
   }
 };
 

@@ -1,6 +1,7 @@
 import React from "react";
 import "./App.css";
 import Spotify from "./util/spotify.js";
+const R = require("ramda");
 
 // Renders the results of the search
 
@@ -91,21 +92,25 @@ class App extends React.Component {
     console.log(artist);
     console.log(album);
     console.log(id);
-    this.filterId(id);
+    this.fetchData(id);
+    console.log(this.state.searchResults);
   };
 
-  filterId = () => {
+  fetchData = () => {
     let results = this.state.searchResults.reduce((id, albums) => {
       return id.concat(albums.id);
     }, []);
-    console.log(results);
-    // Spotify.search("track", null, results[0]).then(searchResults => {
-    //   let bigDicks = searchResults;
-    //   console.log(bigDicks);
-    // });
-  };
 
-  addToCart = e => {
+    const popSearch = () => {
+      Spotify.search("track", undefined, results[0]).then(searchResults => {
+        this.setState({
+          popResults: searchResults,
+          currentSearchType: "album"
+        });
+      });
+    };
+
+    popSearch();
     console.log(this.state.popResults);
   };
 
