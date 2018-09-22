@@ -100,18 +100,24 @@ class App extends React.Component {
     let results = this.state.searchResults.reduce((id, albums) => {
       return id.concat(albums.id);
     }, []);
+    console.log(results)
+
+    let resultOne = R.pick(['id'], this.state.searchResults[0]);
+
 
     const popSearch = () => {
-      Spotify.search("track", undefined, results[0]).then(searchResults => {
+      Spotify.search("track", undefined, results[0]).then(items => {
+        console.log(items)
         this.setState({
-          popResults: searchResults,
+          popResults: items,
           currentSearchType: "album"
         });
       });
     };
 
     popSearch();
-    console.log(this.state.popResults);
+    console.log(this.state.popResults)
+
   };
 
   search = (type, input, id) => {

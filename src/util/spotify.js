@@ -3,6 +3,8 @@ const redirect_uri = encodeURIComponent("http://localhost:3000");
 let accessToken = undefined;
 let expiresIn = undefined;
 
+
+
 const Spotify = {
   getAccessToken() {
     if (accessToken) {
@@ -24,15 +26,13 @@ const Spotify = {
     this.getAccessToken();
 
     const query = () => {
-      if (type === "artist") {
-        return `https://api.spotify.com/v1/search?q=${term}&type=${type}&includes_group=album`;
-      } else if (type === "album") {
+      if (type === "album") {
         return `https://api.spotify.com/v1/search?q=${term}&type=${type}`;
       } else if (type === "track") {
         return `https://api.spotify.com/v1/albums/${id}/tracks?offset=0&limit=20`;
       }
     };
-    if (type === "artist" || "album") {
+    if (type === "track" || "album") {
       return fetch(query(), {
         headers: {
           Authorization: `Bearer ${accessToken}`
@@ -42,19 +42,9 @@ const Spotify = {
         .then(jsonResponse => {
           if (`${type}` === "album" && jsonResponse.albums) {
             return jsonResponse.albums.items;
-          } else if (`${type}` === "artist" && jsonResponse.artists) {
-            return jsonResponse.artists.items;
+          } else if (`${type}` === "track" && jsonResponse.tracks) {
+            return jsonResponse.tracks.items;
           }
-        });
-    } else {
-      return fetch(query(), {
-        headers: {
-          Authorization: `Bearer ${accessToken}`
-        }
-      })
-        .then(response => response.json())
-        .then(jsonResponse => {
-          return jsonResponse.tracks.items;
         });
     }
   }
