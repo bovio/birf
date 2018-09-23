@@ -83,7 +83,8 @@ class App extends React.Component {
       birfWallet: 1000,
       yourWallet: 0,
       searchResults: [],
-      popResults: [],
+      thisResult: [],
+      trackResults: [],
       trackPop: []
     };
   }
@@ -94,30 +95,26 @@ class App extends React.Component {
     console.log(id);
     this.fetchData(id);
     console.log(this.state.searchResults);
+    this.setState({
+      thisResult: id
+    });
+    console.log(this.state.thisResult);
   };
 
   fetchData = () => {
-    let results = this.state.searchResults.reduce((id, albums) => {
-      return id.concat(albums.id);
-    }, []);
-    console.log(results)
+    let thisId = this.state.thisResult;
 
-    let resultOne = R.pick(['id'], this.state.searchResults[0]);
-
-
-    const popSearch = () => {
-      Spotify.search("track", undefined, results[0]).then(items => {
-        console.log(items)
+    const popSearch = id => {
+      Spotify.search("track", undefined, thisId).then(items => {
         this.setState({
-          popResults: items,
+          trackResults: items,
           currentSearchType: "album"
         });
       });
     };
 
     popSearch();
-    console.log(this.state.popResults)
-
+    console.log(this.state.trackResults);
   };
 
   search = (type, input, id) => {

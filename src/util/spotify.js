@@ -3,8 +3,6 @@ const redirect_uri = encodeURIComponent("http://localhost:3000");
 let accessToken = undefined;
 let expiresIn = undefined;
 
-
-
 const Spotify = {
   getAccessToken() {
     if (accessToken) {
@@ -42,8 +40,8 @@ const Spotify = {
         .then(jsonResponse => {
           if (`${type}` === "album" && jsonResponse.albums) {
             return jsonResponse.albums.items;
-          } else if (`${type}` === "track" && jsonResponse.tracks) {
-            return jsonResponse.tracks.items;
+          } else if (`${type}` === "track" && jsonResponse.items) {
+            return jsonResponse.items;
           }
         });
     }
